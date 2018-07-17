@@ -59,7 +59,9 @@ class Server(object):
         self.socket = socket.socket(
             socket.AF_INET,
             socket.SOCK_STREAM,
-            socket.IPPROTO_TCP)
+            socket.IPPROTO_TCP,)
+
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         address = ('127.0.0.1', self.port)
         self.socket.bind(address)
@@ -115,9 +117,9 @@ class Server(object):
 
         received = b''
         while b'\n' not in received:
-            received += self.client_connection.read(16)
+            received += self.client_connection.recv(16)
 
-        self.input_buffer = received.decode()
+        self.input_buffer = received.decode().strip()
 
     def move(self, argument):
 
@@ -192,7 +194,7 @@ class Server(object):
         :return: None
         """
 
-        if self.input_buffer == 'quit':
+        if self.input_buffer == "quit":
             self.quit(None)
 
         received = self.input_buffer.split(" ")
